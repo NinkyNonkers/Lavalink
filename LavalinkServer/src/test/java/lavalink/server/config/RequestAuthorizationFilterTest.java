@@ -51,6 +51,6 @@ public class RequestAuthorizationFilterTest {
         this.mvc.perform(get("/version")
                 .header("Authorization", serverConfig.getPassword()))
                 .andExpect(status().isOk())
-                .andExpect(content().string(appInfo.getVersionBuild()));
+                .andExpect(content().string("NonkPlayer/Lavalink@1.7.0"));
     }
 }

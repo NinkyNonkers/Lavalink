@@ -6,6 +6,7 @@ import dev.arbjerg.lavalink.api.WebSocketExtension
 import lavalink.server.player.TrackEndMarkerHandler
 import lavalink.server.player.filters.Band
 import lavalink.server.player.filters.FilterChain
+import lavalink.server.util.ConsoleLogging
 import lavalink.server.util.Util
 import moe.kyokobot.koe.VoiceServerInfo
 import org.json.JSONObject
@@ -18,10 +19,6 @@ class WebSocketHandler(
     private val wsExtensions: List<WebSocketExtension>,
     private val filterExtensions: List<AudioFilterExtension>
 ) {
-
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(WebSocketHandler::class.java)
-    }
 
     private var loggedEqualizerDeprecationWarning = false
 
@@ -45,7 +42,7 @@ class WebSocketHandler(
 
     fun handle(json: JSONObject) {
         val op = json.getString("op")
-        val handler = handlers[op] ?: return log.warn("Unknown op '$op'")
+        val handler = handlers[op] ?: return ConsoleLogging.LogInfo("Unknown op '$op'")
         handler(json)
     }
 
@@ -74,7 +71,7 @@ class WebSocketHandler(
         val noReplace = json.optBoolean("noReplace", false)
 
         if (noReplace && player.playingTrack != null) {
-            log.info("Skipping play request because of noReplace")
+            ConsoleLogging.LogInfo("Skipping play request because of noReplace")
             return
         }
 
@@ -127,7 +124,7 @@ class WebSocketHandler(
     }
 
     private fun equalizer(json: JSONObject) {
-        if (!loggedEqualizerDeprecationWarning) log.warn("The 'equalizer' op has been deprecated in favour of the " +
+        if (!loggedEqualizerDeprecationWarning) ConsoleLogging.LogInfo("The 'equalizer' op has been deprecated in favour of the " +
                 "'filters' op. Please switch to use that one, as this op will get removed in v4.")
         loggedEqualizerDeprecationWarning = true
 

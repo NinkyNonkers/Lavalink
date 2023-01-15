@@ -47,8 +47,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Player extends AudioEventAdapter implements IPlayer {
 
-    private static final Logger log = LoggerFactory.getLogger(Player.class);
-
     private final SocketContext socketContext;
     private final long guildId;
     private final ServerConfig serverConfig;

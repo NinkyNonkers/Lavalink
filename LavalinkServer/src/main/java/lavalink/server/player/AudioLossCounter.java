@@ -30,9 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AudioLossCounter extends AudioEventAdapter {
-
-    private static final Logger log = LoggerFactory.getLogger(AudioLossCounter.class);
-
     public static final int EXPECTED_PACKET_COUNT_PER_MIN = (60 * 1000) / 20; // 20ms packets
     private static final int ACCEPTABLE_TRACK_SWITCH_TIME = 100; //ms
 

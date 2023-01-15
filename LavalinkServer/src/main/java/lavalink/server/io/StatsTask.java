@@ -25,6 +25,7 @@ package lavalink.server.io;
 import lavalink.server.Launcher;
 import lavalink.server.player.AudioLossCounter;
 import lavalink.server.player.Player;
+import lavalink.server.util.ConsoleLogging;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,6 @@ import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
 
 public class StatsTask implements Runnable {
-
-    private static final Logger log = LoggerFactory.getLogger(StatsTask.class);
 
     private final SocketContext context;
     private final SocketServer socketServer;
@@ -55,7 +54,7 @@ public class StatsTask implements Runnable {
         try {
             sendStats();
         } catch (Exception e) {
-            log.error("Exception while sending stats", e);
+            ConsoleLogging.LogInfo("Exception while sending stats " + e);
         }
     }
 

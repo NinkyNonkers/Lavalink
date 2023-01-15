@@ -31,9 +31,8 @@ public class GcNotificationListener implements NotificationListener {
             GarbageCollectionNotificationInfo notificationInfo = from((CompositeData) notification.getUserData());
             GcInfo info = notificationInfo.getGcInfo();
 
-            if (info != null && !"No GC".equals(notificationInfo.getGcCause())) {
+            if (info != null && !"No GC".equals(notificationInfo.getGcCause()))
                 gcPauses.observe(info.getDuration() / Collector.MILLISECONDS_PER_SECOND);
-            }
         }
     }
 }

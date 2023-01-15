@@ -28,6 +28,7 @@ import dev.arbjerg.lavalink.api.PluginEventHandler
 import dev.arbjerg.lavalink.api.WebSocketExtension
 import lavalink.server.config.ServerConfig
 import lavalink.server.player.Player
+import lavalink.server.util.ConsoleLogging
 import moe.kyokobot.koe.Koe
 import moe.kyokobot.koe.KoeOptions
 import org.json.JSONObject
@@ -55,8 +56,6 @@ class SocketServer(
     private val koe = Koe.koe(koeOptions)
 
     companion object {
-        private val log = LoggerFactory.getLogger(SocketServer::class.java)
-
         fun sendPlayerUpdate(socketContext: SocketContext, player: Player) {
             val json = JSONObject()
 
@@ -88,7 +87,7 @@ class SocketServer(
         if (resumable != null) {
             contextMap[session.id] = resumable
             resumable.resume(session)
-            log.info("Resumed session with key $resumeKey")
+            ConsoleLogging.LogInfo("Resumed session with key $resumeKey")
             resumable.eventEmitter.onWebSocketOpen(true)
             return
         }
@@ -109,15 +108,15 @@ class SocketServer(
         socketContext.eventEmitter.onWebSocketOpen(false)
 
         if (clientName != null) {
-            log.info("Connection successfully established from $clientName")
+            ConsoleLogging.LogInfo("Connection successfully established from $clientName")
             return
         }
 
-        log.info("Connection successfully established")
+        ConsoleLogging.LogInfo("Connection successfully established")
         if (userAgent != null) {
-            log.warn("Library developers: Please specify a 'Client-Name' header. User agent: $userAgent")
+            ConsoleLogging.LogInfo("Library developers: Please specify a 'Client-Name' header. User agent: $userAgent")
         } else {
-            log.warn("Library developers: Please specify a 'Client-Name' header.")
+            ConsoleLogging.LogInfo("Library developers: Please specify a 'Client-Name' header.")
         }
     }
 
@@ -125,24 +124,24 @@ class SocketServer(
         val context = contextMap.remove(session!!.id) ?: return
         if (context.resumeKey != null) {
             resumableSessions.remove(context.resumeKey!!)?.let { removed ->
-                log.warn("Shutdown resumable session with key ${removed.resumeKey} because it has the same key as a " +
+                ConsoleLogging.LogInfo("Shutdown resumable session with key ${removed.resumeKey} because it has the same key as a " +
                         "newly disconnected resumable session.")
                 removed.shutdown()
             }
 
             resumableSessions[context.resumeKey!!] = context
             context.pause()
-            log.info("Connection closed from {} with status {} -- " +
-                    "Session can be resumed within the next {} seconds with key {}",
-                    session.remoteAddress,
-                    status,
-                    context.resumeTimeout,
+            ConsoleLogging.LogInfo("Connection closed from {} with status {} -- " +
+                    "Session can be resumed within the next {} seconds with key " +
+                    session.remoteAddress +
+                    status +
+                    context.resumeTimeout +
                     context.resumeKey
             )
             return
         }
 
-        log.info("Connection closed from {} -- {}", session.remoteAddress, status)
+        ConsoleLogging.LogInfo("Connection closed from " + session.remoteAddress + status)
         context.shutdown()
     }
 
@@ -150,7 +149,7 @@ class SocketServer(
         try {
             handleTextMessageSafe(session!!, message!!)
         } catch (e: Exception) {
-            log.error("Exception while handling websocket message", e)
+            ConsoleLogging.LogInfo("Exception while handling websocket message " + e)
         }
 
     }
@@ -158,10 +157,10 @@ class SocketServer(
     private fun handleTextMessageSafe(session: WebSocketSession, message: TextMessage) {
         val json = JSONObject(message.payload)
 
-        log.info(message.payload)
+        ConsoleLogging.LogInfo(message.payload)
 
         if (!session.isOpen) {
-            log.error("Ignoring closing websocket: " + session.remoteAddress!!)
+            ConsoleLogging.LogInfo("Ignoring closing websocket: " + session.remoteAddress!!)
             return
         }
 

@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 buildscript {
     repositories {
         mavenLocal()
+        mavenCentral()
         maven("https://plugins.gradle.org/m2/")
         maven("https://repo.spring.io/plugins-release")
         maven("https://jitpack.io")

@@ -2,14 +2,11 @@ package lavalink.server.io
 
 import dev.arbjerg.lavalink.api.IPlayer
 import dev.arbjerg.lavalink.api.PluginEventHandler
+import lavalink.server.util.ConsoleLogging
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class EventEmitter(private val context: SocketContext, private val listeners: Collection<PluginEventHandler>) {
-
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(EventEmitter::class.java)
-    }
 
     fun onWebSocketOpen(resumed: Boolean) = iterate { it.onWebSocketOpen(context, resumed) }
     fun onSocketContextPaused() = iterate { it.onSocketContextPaused(context) }
@@ -24,7 +21,7 @@ class EventEmitter(private val context: SocketContext, private val listeners: Co
             try {
                 func(it)
             } catch (e: Exception) {
-                log.error("Error handling event", e)
+                ConsoleLogging.LogError("Error handling event " + e)
             }
         }
     }

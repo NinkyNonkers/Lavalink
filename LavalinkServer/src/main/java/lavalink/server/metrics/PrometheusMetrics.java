@@ -3,6 +3,7 @@ package lavalink.server.metrics;
 import ch.qos.logback.classic.LoggerContext;
 import io.prometheus.client.hotspot.DefaultExports;
 import io.prometheus.client.logback.InstrumentedAppender;
+import lavalink.server.util.ConsoleLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,8 +19,6 @@ import java.lang.management.ManagementFactory;
 @Component
 @ConditionalOnProperty("metrics.prometheus.enabled")
 public class PrometheusMetrics {
-
-    private static final Logger log = LoggerFactory.getLogger(PrometheusMetrics.class);
 
     public PrometheusMetrics() {
 
@@ -42,6 +41,6 @@ public class PrometheusMetrics {
             }
         }
 
-        log.info("Prometheus metrics set up");
+        ConsoleLogging.LogInfo("Prometheus metrics set up");
     }
 }

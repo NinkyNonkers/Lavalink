@@ -33,6 +33,7 @@ import io.undertow.websockets.core.WebSockets
 import io.undertow.websockets.jsr.UndertowSession
 import lavalink.server.config.ServerConfig
 import lavalink.server.player.Player
+import lavalink.server.util.ConsoleLogging
 import moe.kyokobot.koe.KoeClient
 import moe.kyokobot.koe.KoeEventAdapter
 import moe.kyokobot.koe.MediaConnection
@@ -63,10 +64,6 @@ class SocketContext(
     filterExtensions: List<AudioFilterExtension>
 
 ) : ISocketContext {
-
-    companion object {
-        private val log = LoggerFactory.getLogger(SocketContext::class.java)
-    }
 
     //guildId <-> Player
     private val players = ConcurrentHashMap<Long, Player>()
@@ -186,11 +183,11 @@ class SocketContext(
         WebSockets.sendText(payload, undertowSession.webSocketChannel,
             object : WebSocketCallback<Void> {
                 override fun complete(channel: WebSocketChannel, context: Void?) {
-                    log.trace("Sent {}", payload)
+                    ConsoleLogging.LogInfo("Sent " + payload)
                 }
 
                 override fun onError(channel: WebSocketChannel, context: Void?, throwable: Throwable) {
-                    log.error("Error", throwable)
+                    ConsoleLogging.LogInfo("Error " + throwable)
                 }
             })
     }
@@ -203,7 +200,7 @@ class SocketContext(
     fun resume(session: WebSocketSession) {
         sessionPaused = false
         this.session = session
-        log.info("Replaying ${resumeEventQueue.size} events")
+        ConsoleLogging.LogInfo("Replaying ${resumeEventQueue.size} events")
 
         // Bulk actions are not guaranteed to be atomic, so we need to do this imperatively
         while (resumeEventQueue.isNotEmpty()) {
@@ -214,7 +211,7 @@ class SocketContext(
     }
 
     internal fun shutdown() {
-        log.info("Shutting down " + playingPlayers.size + " playing players.")
+        ConsoleLogging.LogInfo("Shutting down " + playingPlayers.size + " playing players.")
         executor.shutdown()
         playerUpdateService.shutdown()
         players.values.forEach {

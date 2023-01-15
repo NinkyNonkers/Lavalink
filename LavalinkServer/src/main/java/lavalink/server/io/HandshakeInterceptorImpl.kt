@@ -1,6 +1,7 @@
 package lavalink.server.io
 
 import lavalink.server.config.ServerConfig
+import lavalink.server.util.ConsoleLogging
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -14,10 +15,6 @@ import org.springframework.web.socket.server.HandshakeInterceptor
 class HandshakeInterceptorImpl @Autowired
 constructor(private val serverConfig: ServerConfig, private val socketServer: SocketServer) : HandshakeInterceptor {
 
-    companion object {
-        private val log = LoggerFactory.getLogger(HandshakeInterceptorImpl::class.java)
-    }
-
     /**
      * Checks credentials and sets the Lavalink version header
      *
@@ -29,9 +26,9 @@ constructor(private val serverConfig: ServerConfig, private val socketServer: So
         val matches = password == serverConfig.password
 
         if (matches) {
-            log.info("Incoming connection from " + request.remoteAddress)
+            ConsoleLogging.LogInfo("Incoming connection from " + request.remoteAddress)
         } else {
-            log.error("Authentication failed from " + request.remoteAddress)
+            ConsoleLogging.LogInfo("Authentication failed from " + request.remoteAddress)
             response.setStatusCode(HttpStatus.UNAUTHORIZED)
         }
 

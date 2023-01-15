@@ -26,6 +26,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lavalink.server.config.ServerConfig;
+import lavalink.server.util.ConsoleLogging;
 import lavalink.server.util.Util;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,7 +48,6 @@ import java.util.concurrent.CompletionStage;
 @RestController
 public class AudioLoaderRestHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(AudioLoaderRestHandler.class);
     private final AudioPlayerManager audioPlayerManager;
     private final ServerConfig serverConfig;
 
@@ -58,7 +58,7 @@ public class AudioLoaderRestHandler {
 
     private void log(HttpServletRequest request) {
         String path = request.getServletPath();
-        log.info("GET " + path);
+        ConsoleLogging.LogInfo("GET " + path);
     }
 
     private JSONObject trackToJSON(AudioTrack audioTrack) {
@@ -90,7 +90,7 @@ public class AudioLoaderRestHandler {
                 object.put("track", encoded);
                 tracks.put(object);
             } catch (IOException e) {
-                log.warn("Failed to encode a track {}, skipping", track.getIdentifier(), e);
+                ConsoleLogging.LogInfo("Failed to encode a track {}, skipping" + track.getIdentifier() + e);
             }
         });
 
@@ -107,7 +107,7 @@ public class AudioLoaderRestHandler {
             exception.put("severity", result.exception.severity.toString());
 
             json.put("exception", exception);
-            log.error("Track loading failed", result.exception);
+            ConsoleLogging.LogInfo("Track loading failed " + result.exception);
         }
 
         return json;
@@ -118,7 +118,7 @@ public class AudioLoaderRestHandler {
     public CompletionStage<ResponseEntity<String>> getLoadTracks(
             HttpServletRequest request,
             @RequestParam String identifier) {
-        log.info("Got request to load for identifier \"{}\"", identifier);
+        ConsoleLogging.LogInfo("Got request to load for identifier " + identifier);
 
         return new AudioLoader(audioPlayerManager).load(identifier)
                 .thenApply(this::encodeLoadResult)
