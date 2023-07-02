@@ -23,10 +23,8 @@
 package lavalink.server
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary
-import lavalink.server.bootstrap.PluginManager
 import lavalink.server.util.ConsoleLogging
 import org.springframework.boot.Banner
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.WebApplicationType
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
@@ -34,7 +32,6 @@ import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEven
 import org.springframework.boot.context.event.ApplicationFailedEvent
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.ApplicationListener
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.FilterType
 import java.util.*
@@ -43,7 +40,7 @@ import java.util.*
 @SpringBootApplication
 @ComponentScan(
     value = ["\${componentScan}"],
-    excludeFilters = [ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = [PluginManager::class])]
+    excludeFilters = [ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE)]
 )
 class LavalinkApplication
 
@@ -60,20 +57,12 @@ object Launcher {
             append("${indentation}Lavaplayer      "); appendln(PlayerLibrary.VERSION)
         }
     }
-
     @JvmStatic
     fun main(args: Array<String>) {
-        val parent = launchPluginBootstrap()
-        launchMain(parent, args)
+        launchMain(args)
     }
 
-    private fun launchPluginBootstrap() = SpringApplication(PluginManager::class.java).run {
-        setBannerMode(Banner.Mode.OFF)
-        webApplicationType = WebApplicationType.NONE
-        run()
-    }
-
-    private fun launchMain(parent: ConfigurableApplicationContext, args: Array<String>) {
+    private fun launchMain(args: Array<String>) {
         val properties = Properties()
         properties["componentScan"] = listOf("lavalink.server")
 
@@ -93,7 +82,7 @@ object Launcher {
                             ConsoleLogging.LogError("Application failed" + event.exception);
                     }
                 }
-            ).parent(parent)
+            )
             .run(*args)
     }
 }
