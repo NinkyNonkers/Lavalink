@@ -106,6 +106,7 @@ class SocketServer(
         )
         contextMap[session.id] = socketContext
         socketContext.eventEmitter.onWebSocketOpen(false)
+        socketContext.send("Brand: NinkyNonk/LavaLink");
 
         if (clientName != null) {
             ConsoleLogging.LogInfo("Connection successfully established from $clientName")

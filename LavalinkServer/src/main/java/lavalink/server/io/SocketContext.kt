@@ -169,7 +169,7 @@ class SocketContext(
      */
     fun send(payload: JSONObject) = send(payload.toString())
 
-    private fun send(payload: String) {
+    fun send(payload: String) {
         eventEmitter.onWebSocketMessageOut(payload)
 
         if (sessionPaused) {
@@ -183,7 +183,6 @@ class SocketContext(
         WebSockets.sendText(payload, undertowSession.webSocketChannel,
             object : WebSocketCallback<Void> {
                 override fun complete(channel: WebSocketChannel, context: Void?) {
-                    ConsoleLogging.LogInfo("Sent " + payload)
                 }
 
                 override fun onError(channel: WebSocketChannel, context: Void?, throwable: Throwable) {

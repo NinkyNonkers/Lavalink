@@ -30,9 +30,6 @@ public class RequestAuthorizationFilterTest {
     @Autowired
     protected ServerConfig serverConfig;
 
-    @Autowired
-    protected AppInfo appInfo;
-
     @Test
     public void unauthenticatedRequest_Fail() throws Exception {
         this.mvc.perform(get("/loadtracks"))

@@ -28,8 +28,6 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lavalink.server.util.ConsoleLogging;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,9 +52,9 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     public CompletionStage<LoadResult> load(String identifier) {
         boolean isUsed = this.used.getAndSet(true);
-        if (isUsed) {
+
+        if (isUsed)
             throw new IllegalStateException("This loader can only be used once per instance");
-        }
 
         ConsoleLogging.LogInfo("Loading item with identifier " + identifier);
         this.audioPlayerManager.loadItem(identifier, this);

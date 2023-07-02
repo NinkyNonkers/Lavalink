@@ -1,5 +1,6 @@
 package lavalink.server.config;
 
+import lavalink.server.util.ConsoleLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 public class RequestAuthorizationFilter implements HandlerInterceptor, WebMvcConfigurer {
 
-    private static final Logger log = LoggerFactory.getLogger(RequestAuthorizationFilter.class);
     private ServerConfig serverConfig;
     private MetricsPrometheusConfigProperties metricsConfig;
 
@@ -34,16 +34,11 @@ public class RequestAuthorizationFilter implements HandlerInterceptor, WebMvcCon
         String authorization = request.getHeader("Authorization");
 
         if (authorization == null || !authorization.equals(serverConfig.getPassword())) {
-            String method = request.getMethod();
-            String path = request.getRequestURI().substring(request.getContextPath().length());
-            String ip = request.getRemoteAddr();
-
             if (authorization == null) {
-                log.warn("Authorization missing for {} on {} {}", ip, method, path);
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return false;
             }
-            log.warn("Authorization failed for {} on {} {}", ip, method, path);
+            ConsoleLogging.LogError("Authorization failed");
             response.setStatus(HttpStatus.FORBIDDEN.value());
             return false;
         }

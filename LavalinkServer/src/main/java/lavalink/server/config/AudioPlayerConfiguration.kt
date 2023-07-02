@@ -21,6 +21,7 @@ import com.sedmelluq.lava.extensions.youtuberotator.planner.*
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv4Block
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block
 import dev.arbjerg.lavalink.api.AudioPlayerManagerConfiguration
+import lavalink.server.util.ConsoleLogging
 import org.apache.http.HttpHost
 import org.apache.http.auth.AuthScope
 import org.apache.http.auth.UsernamePasswordCredentials
@@ -39,8 +40,6 @@ import java.util.function.Predicate
 @Configuration
 class AudioPlayerConfiguration {
 
-    private val log = LoggerFactory.getLogger(AudioPlayerConfiguration::class.java)
-
     @Bean
     fun audioPlayerManagerSupplier(
         sources: AudioSourcesConfig,
@@ -52,52 +51,48 @@ class AudioPlayerConfiguration {
     ): AudioPlayerManager {
         val audioPlayerManager = DefaultAudioPlayerManager()
 
-        if (serverConfig.isGcWarnings) {
+        if (serverConfig.isGcWarnings)
             audioPlayerManager.enableGcMonitoring()
-        }
 
         val defaultFrameBufferDuration = audioPlayerManager.frameBufferDuration
         serverConfig.frameBufferDurationMs?.let {
-            if (it < 200) { // At the time of writing, LP enforces a minimum of 200ms.
-                log.warn("Buffer size of {}ms is illegal. Defaulting to {}", it, defaultFrameBufferDuration)
-            }
+            if (it < 200)  // At the time of writing, LP enforces a minimum of 200ms.
+                ConsoleLogging.LogUpdate("Buffer size is illegal. Defaulting to " + defaultFrameBufferDuration)
 
             val bufferDuration = it.takeIf { it >= 200 } ?: defaultFrameBufferDuration
-            log.debug("Setting frame buffer duration to {}", bufferDuration)
+            ConsoleLogging.LogInfo("Setting frame buffer duration to " + bufferDuration)
             audioPlayerManager.frameBufferDuration = bufferDuration
         }
 
         val defaultOpusEncodingQuality = AudioConfiguration.OPUS_QUALITY_MAX
         audioPlayerManager.configuration.let {
             serverConfig.opusEncodingQuality?.let { opusQuality ->
-                if (opusQuality !in 0..10) {
-                    log.warn("Opus encoding quality {} is not within the range of 0 to 10. Defaulting to {}", opusQuality, defaultOpusEncodingQuality)
-                }
+                if (opusQuality !in 0..10)
+                    ConsoleLogging.LogUpdate("Opus encoding quality {} is not within the range of 0 to 10");
 
                 val qualitySetting = opusQuality.takeIf { it in 0..10 } ?: defaultOpusEncodingQuality
-                log.debug("Setting opusEncodingQuality to {}", qualitySetting)
+                ConsoleLogging.LogInfo("Setting opusEncodingQuality to " + qualitySetting)
                 it.opusEncodingQuality = qualitySetting
             }
 
             serverConfig.resamplingQuality?.let { resamplingQuality ->
-                log.debug("Setting resamplingQuality to {}", resamplingQuality)
+                ConsoleLogging.LogInfo("Setting resamplingQuality to " + resamplingQuality)
                 it.resamplingQuality = resamplingQuality
             }
         }
 
         val defaultTrackStuckThresholdMs = TimeUnit.NANOSECONDS.toMillis(audioPlayerManager.trackStuckThresholdNanos)
         serverConfig.trackStuckThresholdMs?.let {
-            if (it < 100) {
-                log.warn("Track Stuck Threshold of {}ms is too small. Defaulting to {}ms", it, defaultTrackStuckThresholdMs)
-            }
+            if (it < 100)
+                ConsoleLogging.LogUpdate("Track Stuck Threshold is too small");
 
             val trackStuckThresholdMs: Long = it.takeIf { it >= 100 } ?: defaultTrackStuckThresholdMs
-            log.debug("Setting Track Stuck Threshold to {}ms", trackStuckThresholdMs)
+            ConsoleLogging.LogInfo("Setting Track Stuck Threshold to " + trackStuckThresholdMs)
             audioPlayerManager.setTrackStuckThreshold(trackStuckThresholdMs)
         }
 
         serverConfig.useSeekGhosting?.let { seekGhosting ->
-            log.debug("Setting useSeekGhosting to {}", seekGhosting)
+            ConsoleLogging.LogInfo("Setting useSeekGhosting to " + seekGhosting)
             audioPlayerManager.setUseSeekGhosting(seekGhosting)
         }
 
@@ -107,9 +102,9 @@ class AudioPlayerConfiguration {
             val youtubeConfig = serverConfig.youtubeConfig
             val youtube: YoutubeAudioSourceManager
             if (youtubeConfig != null) {
-                if (youtubeConfig.email.isBlank() && youtubeConfig.password.isBlank()) {
-                    log.info("Email and password fields are blank, some age restricted videos will throw exceptions")
-                }
+                if (youtubeConfig.email.isBlank() && youtubeConfig.password.isBlank())
+                    ConsoleLogging.LogUpdate("Email and password fields are blank, some age restricted videos will throw exceptions")
+
                 youtube = YoutubeAudioSourceManager(
                     serverConfig.isYoutubeSearchEnabled,
                     youtubeConfig.email,
@@ -121,7 +116,7 @@ class AudioPlayerConfiguration {
                     "",
                     ""
                 )
-                log.debug("Youtube config block is not found")
+                ConsoleLogging.LogUpdate("Youtube config block is not found")
             }
             if (routePlanner != null) {
                 val retryLimit = serverConfig.ratelimit?.retryLimit ?: -1
@@ -159,10 +154,6 @@ class AudioPlayerConfiguration {
         if (sources.isMixer) audioPlayerManager.registerSourceManager(BeamAudioSourceManager())
         if (sources.isLocal) audioPlayerManager.registerSourceManager(LocalAudioSourceManager(mcr))
 
-        audioSourceManagers.forEach {
-            audioPlayerManager.registerSourceManager(it)
-            log.info("Registered {} provided from a plugin", it)
-        }
 
         audioPlayerManager.configuration.isFilterHotSwapEnabled = true
 
@@ -203,12 +194,12 @@ class AudioPlayerConfiguration {
     fun routePlanner(serverConfig: ServerConfig): AbstractRoutePlanner? {
         val rateLimitConfig = serverConfig.ratelimit
         if (rateLimitConfig == null) {
-            log.debug("No rate limit config block found, skipping setup of route planner")
+            ConsoleLogging.LogUpdate("No rate limit config block found, skipping setup of route planner")
             return null
         }
         val ipBlockList = rateLimitConfig.ipBlocks
         if (ipBlockList.isEmpty()) {
-            log.info("List of ip blocks is empty, skipping setup of route planner")
+            ConsoleLogging.LogUpdate("List of ip blocks is empty, skipping setup of route planner")
             return null
         }
 

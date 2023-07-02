@@ -30,16 +30,9 @@ import lavalink.server.util.ConsoleLogging;
 import lavalink.server.util.Util;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -49,11 +42,9 @@ import java.util.concurrent.CompletionStage;
 public class AudioLoaderRestHandler {
 
     private final AudioPlayerManager audioPlayerManager;
-    private final ServerConfig serverConfig;
 
-    public AudioLoaderRestHandler(AudioPlayerManager audioPlayerManager, ServerConfig serverConfig) {
+    public AudioLoaderRestHandler(AudioPlayerManager audioPlayerManager) {
         this.audioPlayerManager = audioPlayerManager;
-        this.serverConfig = serverConfig;
     }
 
     private void log(HttpServletRequest request) {

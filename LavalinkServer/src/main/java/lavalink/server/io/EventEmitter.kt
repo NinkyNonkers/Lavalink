@@ -3,8 +3,6 @@ package lavalink.server.io
 import dev.arbjerg.lavalink.api.IPlayer
 import dev.arbjerg.lavalink.api.PluginEventHandler
 import lavalink.server.util.ConsoleLogging
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class EventEmitter(private val context: SocketContext, private val listeners: Collection<PluginEventHandler>) {
 

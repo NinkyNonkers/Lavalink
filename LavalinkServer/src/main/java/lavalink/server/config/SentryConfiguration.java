@@ -7,6 +7,7 @@ import io.sentry.Sentry;
 import io.sentry.SentryClient;
 import io.sentry.logback.SentryAppender;
 import lavalink.server.Launcher;
+import lavalink.server.util.ConsoleLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,6 @@ import java.util.Properties;
 @Configuration
 public class SentryConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(SentryConfiguration.class);
     private static final String SENTRY_APPENDER_NAME = "SENTRY";
 
     public SentryConfiguration(ServerConfig serverConfig, SentryConfigProperties sentryConfig) {
@@ -39,7 +39,7 @@ public class SentryConfiguration {
         if (dsn != null && !dsn.isEmpty()) {
             turnOn(dsn, sentryConfig.getTags(), sentryConfig.getEnvironment());
             if (warnDeprecatedDsnConfig) {
-                log.warn("Please update the location of the sentry dsn in lavalinks config file / your environment "
+                ConsoleLogging.LogInfo("Please update the location of the sentry dsn in lavalinks config file / your environment "
                         + "vars, it is now located under 'sentry.dsn' instead of 'lavalink.server.sentryDsn'.");
             }
         } else {
@@ -49,7 +49,7 @@ public class SentryConfiguration {
 
 
     public void turnOn(String dsn, Map<String, String> tags, String environment) {
-        log.info("Turning on sentry");
+        ConsoleLogging.LogInfo("Turning on sentry");
         SentryClient sentryClient = Sentry.init(dsn);
         if (!environment.isBlank()) sentryClient.setEnvironment(environment);
 
@@ -63,22 +63,22 @@ public class SentryConfiguration {
             //noinspection ConstantConditions
             gitProps.load(Launcher.class.getClassLoader().getResourceAsStream("git.properties"));
         } catch (NullPointerException | IOException e) {
-            log.error("Failed to load git repo information", e);
+            ConsoleLogging.LogError("Failed to load git repo information: " + e);
         }
 
         String commitHash = gitProps.getProperty("git.commit.id");
         if (commitHash != null && !commitHash.isEmpty()) {
-            log.info("Setting sentry release to commit hash {}", commitHash);
+            ConsoleLogging.LogInfo("Setting sentry release to commit hash " + commitHash);
             sentryClient.setRelease(commitHash);
         } else {
-            log.warn("No git commit hash found to set up sentry release");
+            ConsoleLogging.LogInfo("No git commit hash found to set up sentry release");
         }
 
         getSentryLogbackAppender().start();
     }
 
     public void turnOff() {
-        log.warn("Turning off sentry");
+        ConsoleLogging.LogInfo("Turning off sentry");
         Sentry.close();
         getSentryLogbackAppender().stop();
     }

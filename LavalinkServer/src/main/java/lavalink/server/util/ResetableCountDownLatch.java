@@ -30,9 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 public class ResetableCountDownLatch {
-
-    private static final Logger log = LoggerFactory.getLogger(ResetableCountDownLatch.class);
-
     private final int startCount;
     private CountDownLatch latch;
 
