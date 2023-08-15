@@ -5,7 +5,7 @@ buildscript {
         mavenLocal()
         mavenCentral()
         maven("https://plugins.gradle.org/m2/")
-        maven("https://repo.spring.io/plugins-release")
+        //maven("https://repo.spring.io/plugins-release")
         maven("https://jitpack.io")
         maven("https://m2.dv8tion.net/releases")
     }
@@ -27,8 +27,9 @@ allprojects {
         mavenCentral() // main maven repo
         mavenLocal()   // useful for developing
         maven("https://m2.dv8tion.net/releases")
-        jcenter()
         maven("https://jitpack.io") // build projects directly from GitHub
+        maven("https://plugins.gradle.org/m2/")
+        //maven("https://repo.spring.io/plugins-release")
     }
 }
 
