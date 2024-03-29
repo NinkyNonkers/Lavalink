@@ -1,4 +1,4 @@
-package dev.arbjerg.lavalink.api;
+package lavalink.api;
 
 import org.json.JSONObject;
 import org.springframework.lang.Nullable;

@@ -19,7 +19,6 @@ repositories {
 
 dependencies {
     compileOnly(libs.lavalink.client)
-    compileOnly(libs.logback)
     compileOnly(libs.kotlin.stdlib.jdk8)
     compileOnly(libs.jda) {
         exclude(module = "opus-java")

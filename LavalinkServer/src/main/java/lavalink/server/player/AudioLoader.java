@@ -27,7 +27,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import lavalink.server.util.ConsoleLogging;
+import lavalink.server.logging.ConsoleLogging;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,11 +1,8 @@
 package lavalink.server.metrics;
 
-import ch.qos.logback.classic.LoggerContext;
 import io.prometheus.client.hotspot.DefaultExports;
 import io.prometheus.client.logback.InstrumentedAppender;
-import lavalink.server.util.ConsoleLogging;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lavalink.server.logging.ConsoleLogging;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -24,11 +21,7 @@ public class PrometheusMetrics {
 
         InstrumentedAppender prometheusAppender = new InstrumentedAppender();
         //log metrics
-        final LoggerContext factory = (LoggerContext) LoggerFactory.getILoggerFactory();
-        final ch.qos.logback.classic.Logger root = factory.getLogger(Logger.ROOT_LOGGER_NAME);
-        prometheusAppender.setContext(root.getLoggerContext());
         prometheusAppender.start();
-        root.addAppender(prometheusAppender);
 
         //jvm (hotspot) metrics
         DefaultExports.initialize();
@@ -36,11 +29,10 @@ public class PrometheusMetrics {
         //gc pause buckets
         final GcNotificationListener gcNotificationListener = new GcNotificationListener();
         for (GarbageCollectorMXBean gcBean : ManagementFactory.getGarbageCollectorMXBeans()) {
-            if (gcBean instanceof NotificationEmitter) {
+            if (gcBean instanceof NotificationEmitter)
                 ((NotificationEmitter) gcBean).addNotificationListener(gcNotificationListener, null, gcBean);
-            }
         }
 
-        ConsoleLogging.LogInfo("Prometheus metrics set up");
+        ConsoleLogging.LogUpdate("Prometheus metrics set up");
     }
 }

@@ -3,7 +3,6 @@ package lavalink.server.config
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerProbe
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry
 import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration
-import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration.ResamplingQuality
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager
@@ -15,19 +14,16 @@ import com.sedmelluq.discord.lavaplayer.source.soundcloud.*
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter
 import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup
 import com.sedmelluq.lava.extensions.youtuberotator.planner.*
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv4Block
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block
-import dev.arbjerg.lavalink.api.AudioPlayerManagerConfiguration
-import lavalink.server.util.ConsoleLogging
+import lavalink.server.logging.ConsoleLogging
 import org.apache.http.HttpHost
 import org.apache.http.auth.AuthScope
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.apache.http.client.CredentialsProvider
 import org.apache.http.impl.client.BasicCredentialsProvider
-import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.net.InetAddress
@@ -46,7 +42,6 @@ class AudioPlayerConfiguration {
         serverConfig: ServerConfig,
         routePlanner: AbstractRoutePlanner?,
         audioSourceManagers: Collection<AudioSourceManager>,
-        audioPlayerManagerConfigurations: Collection<AudioPlayerManagerConfiguration>,
         mediaContainerProbes: Collection<MediaContainerProbe>
     ): AudioPlayerManager {
         val audioPlayerManager = DefaultAudioPlayerManager()
@@ -158,10 +153,6 @@ class AudioPlayerConfiguration {
         audioPlayerManager.configuration.isFilterHotSwapEnabled = true
 
         var am: AudioPlayerManager = audioPlayerManager
-
-        audioPlayerManagerConfigurations.forEach {
-            am = it.configure(am)
-        }
 
         // This must be loaded last
         if (sources.isHttp) {

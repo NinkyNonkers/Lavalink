@@ -23,33 +23,24 @@
 package lavalink.server.io
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
-import dev.arbjerg.lavalink.api.AudioFilterExtension
-import dev.arbjerg.lavalink.api.ISocketContext
-import dev.arbjerg.lavalink.api.PluginEventHandler
-import dev.arbjerg.lavalink.api.WebSocketExtension
 import io.undertow.websockets.core.WebSocketCallback
 import io.undertow.websockets.core.WebSocketChannel
 import io.undertow.websockets.core.WebSockets
 import io.undertow.websockets.jsr.UndertowSession
+import lavalink.api.ISocketContext
 import lavalink.server.config.ServerConfig
 import lavalink.server.player.Player
-import lavalink.server.util.ConsoleLogging
+import lavalink.server.logging.ConsoleLogging
 import moe.kyokobot.koe.KoeClient
 import moe.kyokobot.koe.KoeEventAdapter
 import moe.kyokobot.koe.MediaConnection
 import org.json.JSONObject
-import org.slf4j.LoggerFactory
 import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.adapter.standard.StandardWebSocketSession
 import java.net.InetSocketAddress
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 
 class SocketContext(
     val audioPlayerManager: AudioPlayerManager,
@@ -59,17 +50,13 @@ class SocketContext(
     private val userId: String,
     private val clientName: String?,
     val koe: KoeClient,
-    eventHandlers: Collection<PluginEventHandler>,
-    webSocketExtensions: List<WebSocketExtension>,
-    filterExtensions: List<AudioFilterExtension>
 
 ) : ISocketContext {
 
     //guildId <-> Player
     private val players = ConcurrentHashMap<Long, Player>()
 
-    val eventEmitter = EventEmitter(this, eventHandlers)
-    val wsHandler = WebSocketHandler(this, webSocketExtensions, filterExtensions)
+    val wsHandler = WebSocketHandler(this)
 
     @Volatile
     var sessionPaused = false
@@ -113,7 +100,6 @@ class SocketContext(
 
     override fun getPlayer(guildId: Long) = players.computeIfAbsent(guildId) {
         val player = Player(this, guildId, audioPlayerManager, serverConfig)
-        eventEmitter.onNewPlayer(player)
         player
     }
 
@@ -139,10 +125,8 @@ class SocketContext(
      */
     override fun destroyPlayer(guild: Long) {
         val player = players.remove(guild)
-        if (player != null) {
-            eventEmitter.onDestroyPlayer(player)
+        if (player != null)
             player.destroy()
-        }
         koe.destroyConnection(guild)
     }
 
@@ -151,7 +135,6 @@ class SocketContext(
         sessionTimeoutFuture = executor.schedule<Unit>({
             socketServer.onSessionResumeTimeout(this)
         }, resumeTimeout, TimeUnit.SECONDS)
-        eventEmitter.onSocketContextPaused()
     }
 
     override fun sendMessage(message: JSONObject) {
@@ -170,7 +153,6 @@ class SocketContext(
     fun send(payload: JSONObject) = send(payload.toString())
 
     fun send(payload: String) {
-        eventEmitter.onWebSocketMessageOut(payload)
 
         if (sessionPaused) {
             resumeEventQueue.add(payload)
@@ -217,7 +199,6 @@ class SocketContext(
             this.destroyPlayer(it.guildId)
         }
         koe.close()
-        eventEmitter.onSocketContextDestroyed()
     }
 
     override fun closeWebSocket(closeCode: Int, reason: String?) {

@@ -1,24 +1,17 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven("https://plugins.gradle.org/m2/")
-        //maven("https://repo.spring.io/plugins-release")
-        maven("https://jitpack.io")
-        maven("https://m2.dv8tion.net/releases")
-    }
-
-    dependencies {
-        classpath("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.5.2")
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.6.6")
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2")
-        classpath("com.adarshr:gradle-test-logger-plugin:1.6.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61")
-        classpath("org.jetbrains.kotlin:kotlin-allopen:1.3.61")
-    }
+plugins {
+    id("org.jetbrains.dokka") version "1.8.20" apply false
+    id("com.gorylenko.gradle-git-properties") version "2.4.1"
+    id("org.ajoberstar.grgit") version "5.2.0"
+    id("org.springframework.boot") version "3.1.0" apply false
+    id("org.sonarqube") version "4.2.0.3129"
+    id("com.adarshr.test-logger") version "3.2.0"
+    id("org.jetbrains.kotlin.jvm") version "1.8.22"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.8.22"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.22" apply false
 }
+
 
 allprojects {
     group = "lavalink"
@@ -29,7 +22,8 @@ allprojects {
         maven("https://m2.dv8tion.net/releases")
         maven("https://jitpack.io") // build projects directly from GitHub
         maven("https://plugins.gradle.org/m2/")
-        //maven("https://repo.spring.io/plugins-release")
+        maven("https://repo.spring.io/plugins-release")
+        maven("https://maven.lavalink.dev/releases")
     }
 }
 
@@ -43,7 +37,7 @@ subprojects {
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "17"
     }
 
     tasks.withType<JavaCompile> {

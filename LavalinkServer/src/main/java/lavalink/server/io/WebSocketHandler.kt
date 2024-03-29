@@ -1,23 +1,16 @@
 package lavalink.server.io
 
 import com.sedmelluq.discord.lavaplayer.track.TrackMarker
-import dev.arbjerg.lavalink.api.AudioFilterExtension
-import dev.arbjerg.lavalink.api.WebSocketExtension
 import lavalink.server.player.TrackEndMarkerHandler
 import lavalink.server.player.filters.Band
 import lavalink.server.player.filters.FilterChain
-import lavalink.server.util.ConsoleLogging
+import lavalink.server.logging.ConsoleLogging
 import lavalink.server.util.Util
 import moe.kyokobot.koe.VoiceServerInfo
 import org.json.JSONObject
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import kotlin.reflect.KFunction1
 
 class WebSocketHandler(
     private val context: SocketContext,
-    private val wsExtensions: List<WebSocketExtension>,
-    private val filterExtensions: List<AudioFilterExtension>
 ) {
 
     private var loggedEqualizerDeprecationWarning = false
@@ -33,12 +26,7 @@ class WebSocketHandler(
         "filters" to ::filters,
         "destroy" to ::destroy,
         "configureResuming" to ::configureResuming
-    ).apply {
-        wsExtensions.forEach {
-            val func = fun(json: JSONObject) { it.onInvocation(context, json) }
-            this[it.opName] = func as KFunction1<JSONObject, Unit>
-        }
-    }
+    )
 
     fun handle(json: JSONObject) {
         val op = json.getString("op")
@@ -142,7 +130,7 @@ class WebSocketHandler(
 
     private fun filters(json: JSONObject) {
         val player = context.getPlayer(json.getLong("guildId"))
-        player.filters = FilterChain.parse(json, filterExtensions)
+        player.filters = FilterChain.parse(json)
     }
 
     private fun destroy(json: JSONObject) {

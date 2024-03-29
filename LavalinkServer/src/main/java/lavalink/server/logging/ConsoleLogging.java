@@ -1,4 +1,4 @@
-package lavalink.server.util;
+package lavalink.server.logging;
 
 public final class ConsoleLogging {
 

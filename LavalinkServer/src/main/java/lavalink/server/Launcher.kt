@@ -23,7 +23,7 @@
 package lavalink.server
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary
-import lavalink.server.util.ConsoleLogging
+import lavalink.server.logging.ConsoleLogging
 import org.springframework.boot.Banner
 import org.springframework.boot.WebApplicationType
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -36,7 +36,7 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.FilterType
 import java.util.*
 
-@Suppress("SpringBootApplicationSetup", "SpringComponentScan")
+@Suppress("SpringComponentScan")
 @SpringBootApplication
 @ComponentScan(
     value = ["\${componentScan}"],
@@ -49,12 +49,12 @@ object Launcher {
     val startTime = System.currentTimeMillis()
 
     private fun getVersionInfo(indentation: String = "\t"): String {
-        val version = "NinkyNonk/Lavalink@1.7.0"
+        val version = "NinkyNonk/Lavalink@1.7.2"
 
         return buildString {
             append("${indentation}Version:        "); appendln(version)
             append("${indentation}JVM:            "); appendln(System.getProperty("java.version"))
-            append("${indentation}Lavaplayer      "); appendln(PlayerLibrary.VERSION)
+            append("${indentation}Lavaplayer:      "); appendln(PlayerLibrary.VERSION)
         }
     }
     @JvmStatic

@@ -29,7 +29,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import io.netty.buffer.ByteBuf;
-import dev.arbjerg.lavalink.api.ISocketContext;
+import lavalink.api.IPlayer;
+import lavalink.api.ISocketContext;
 import lavalink.server.io.SocketContext;
 import lavalink.server.io.SocketServer;
 import lavalink.server.player.filters.FilterChain;
@@ -37,9 +38,6 @@ import lavalink.server.config.ServerConfig;
 import moe.kyokobot.koe.MediaConnection;
 import moe.kyokobot.koe.media.OpusAudioFrameProvider;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import dev.arbjerg.lavalink.api.IPlayer;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.ScheduledFuture;
@@ -141,10 +139,6 @@ public class Player extends AudioEventAdapter implements IPlayer {
     @Nullable
     public AudioTrack getPlayingTrack() {
         return player.getPlayingTrack();
-    }
-
-    public boolean isPaused() {
-        return player.isPaused();
     }
 
     public AudioLossCounter getAudioLossCounter() {

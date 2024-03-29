@@ -23,16 +23,12 @@
 package lavalink.server.io
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
-import dev.arbjerg.lavalink.api.AudioFilterExtension
-import dev.arbjerg.lavalink.api.PluginEventHandler
-import dev.arbjerg.lavalink.api.WebSocketExtension
 import lavalink.server.config.ServerConfig
 import lavalink.server.player.Player
-import lavalink.server.util.ConsoleLogging
+import lavalink.server.logging.ConsoleLogging
 import moe.kyokobot.koe.Koe
 import moe.kyokobot.koe.KoeOptions
 import org.json.JSONObject
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
@@ -45,9 +41,6 @@ class SocketServer(
         private val serverConfig: ServerConfig,
         private val audioPlayerManager: AudioPlayerManager,
         koeOptions: KoeOptions,
-        private val eventHandlers: List<PluginEventHandler>,
-        private val webSocketExtensions: List<WebSocketExtension>,
-        private val filterExtensions: List<AudioFilterExtension>
 ) : TextWebSocketHandler() {
 
     // userId <-> shardCount
@@ -88,7 +81,6 @@ class SocketServer(
             contextMap[session.id] = resumable
             resumable.resume(session)
             ConsoleLogging.LogInfo("Resumed session with key $resumeKey")
-            resumable.eventEmitter.onWebSocketOpen(true)
             return
         }
 
@@ -100,12 +92,8 @@ class SocketServer(
                 userId,
                 clientName,
                 koe.newClient(userId.toLong()),
-                eventHandlers,
-                webSocketExtensions,
-                filterExtensions
         )
         contextMap[session.id] = socketContext
-        socketContext.eventEmitter.onWebSocketOpen(false)
         socketContext.send("Brand: NinkyNonk/LavaLink");
 
         if (clientName != null) {
@@ -167,7 +155,6 @@ class SocketServer(
 
         val context = contextMap[session.id]
                 ?: throw IllegalStateException("No context for session ID ${session.id}. Broken websocket?")
-        context.eventEmitter.onWebsocketMessageIn(message.payload)
         context.wsHandler.handle(json)
     }
 

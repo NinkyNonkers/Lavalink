@@ -3,7 +3,7 @@ package lavalink.server.config
 import com.sedmelluq.lava.common.natives.architecture.DefaultArchitectureTypes
 import com.sedmelluq.lava.common.natives.architecture.DefaultOperatingSystemTypes
 import com.sedmelluq.lava.common.natives.architecture.SystemType
-import lavalink.server.util.ConsoleLogging
+import lavalink.server.logging.ConsoleLogging
 import moe.kyokobot.koe.KoeOptions
 import moe.kyokobot.koe.codec.udpqueue.UdpQueueFramePollerFactory
 import org.springframework.context.annotation.Bean
@@ -32,12 +32,12 @@ class KoeConfiguration(val serverConfig: ServerConfig) {
         } catch (e: IllegalArgumentException) {
             null
         }
-        ConsoleLogging.LogInfo("OS: ${systemType?.osType ?: "unknown"}, Arch: ${systemType?.architectureType ?: "unknown"}")
+        ConsoleLogging.LogUpdate("OS: ${systemType?.osType ?: "unknown"}, Arch: ${systemType?.architectureType ?: "unknown"}")
 
         val nasSupported = supportedSystems.any { it.osType == systemType?.osType && it.architectureType == systemType?.architectureType }
 
         if (nasSupported) {
-            ConsoleLogging.LogInfo("Enabling JDA-NAS")
+            ConsoleLogging.LogInfo("Enabling JDA-NAS...")
             var bufferSize = serverConfig.bufferDurationMs ?: UdpQueueFramePollerFactory.DEFAULT_BUFFER_DURATION
             if (bufferSize < 40) {
                 ConsoleLogging.LogUpdate("Buffer size is illegal. Defaulting to " + UdpQueueFramePollerFactory.DEFAULT_BUFFER_DURATION)

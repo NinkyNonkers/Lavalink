@@ -1,8 +1,7 @@
 package lavalink.server.io
 
 import lavalink.server.config.ServerConfig
-import lavalink.server.util.ConsoleLogging
-import org.slf4j.LoggerFactory
+import lavalink.server.logging.ConsoleLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.server.ServerHttpRequest

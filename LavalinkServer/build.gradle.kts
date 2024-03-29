@@ -5,7 +5,9 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
     application
-    `maven-publish`
+    kotlin("jvm")
+    id("org.jetbrains.dokka")
+    java
 }
 
 apply(plugin = "org.springframework.boot")
@@ -23,8 +25,8 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 configurations {
@@ -34,7 +36,7 @@ configurations {
 }
 
 dependencies {
-    implementation(projects.pluginApi)
+    //implementation(projects.pluginApi)
 
     implementation(libs.bundles.metrics)
     implementation(libs.bundles.spring) {
@@ -55,8 +57,6 @@ dependencies {
 
     implementation(libs.lavadsp)
     implementation(libs.kotlin.reflect)
-    implementation(libs.logback)
-    implementation(libs.sentry.logback)
     implementation(libs.oshi)
     implementation(libs.json)
     implementation(libs.gson)
