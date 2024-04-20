@@ -1,4 +1,3 @@
-import org.ajoberstar.grgit.Grgit
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
@@ -11,14 +10,11 @@ plugins {
 }
 
 apply(plugin = "org.springframework.boot")
-apply(plugin = "com.gorylenko.gradle-git-properties")
-apply(plugin = "org.ajoberstar.grgit")
-apply(plugin = "com.adarshr.test-logger")
 apply(plugin = "kotlin")
 apply(plugin = "kotlin-spring")
 
 description = "Play audio to discord voice channels"
-version = versionFromTag()
+version = "1.7.2"
 
 application {
     mainClass.set("lavalink.server.Launcher")
@@ -115,18 +111,4 @@ tasks {
             jvmArgs?.addAll(args)
         }
     }
-}
-
-@SuppressWarnings("GrMethodMayBeStatic")
-fun versionFromTag(): String = Grgit.open(mapOf("currentDir" to project.rootDir)).use { git ->
-    val headTag = git.tag
-        .list()
-        .find { it.commit.id == git.head().id }
-
-    val clean = git.status().isClean || System.getenv("CI") != null
-    if (!clean) {
-        println("Git state is dirty, setting version as snapshot.")
-    }
-
-    return if (headTag != null && clean) headTag.name else "${git.head().id}-SNAPSHOT"
 }

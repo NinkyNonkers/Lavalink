@@ -64,7 +64,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
-        ConsoleLogging.LogInfo("Loaded track " + audioTrack.getInfo().title);
+        ConsoleLogging.LogUpdate("Loaded track " + audioTrack.getInfo().title);
         ArrayList<AudioTrack> result = new ArrayList<>();
         result.add(audioTrack);
         this.loadResult.complete(new LoadResult(ResultStatus.TRACK_LOADED, result, null, null));
@@ -72,7 +72,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
-        ConsoleLogging.LogInfo("Loaded playlist " + audioPlaylist.getName());
+        ConsoleLogging.LogUpdate("Loaded playlist " + audioPlaylist.getName());
 
         String playlistName = null;
         Integer selectedTrack = null;
@@ -89,13 +89,13 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        ConsoleLogging.LogInfo("No matches found");
+        ConsoleLogging.LogUpdate("No matches found");
         this.loadResult.complete(NO_MATCHES);
     }
 
     @Override
     public void loadFailed(FriendlyException e) {
-        ConsoleLogging.LogInfo("Load failed " + e);
+        ConsoleLogging.LogError("Load failed " + e);
         this.loadResult.complete(new LoadResult(e));
     }
 

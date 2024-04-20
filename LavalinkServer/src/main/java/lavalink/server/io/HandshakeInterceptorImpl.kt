@@ -25,9 +25,9 @@ constructor(private val serverConfig: ServerConfig, private val socketServer: So
         val matches = password == serverConfig.password
 
         if (matches) {
-            ConsoleLogging.LogInfo("Incoming connection from " + request.remoteAddress)
+            ConsoleLogging.LogUpdate("Incoming connection from " + request.remoteAddress)
         } else {
-            ConsoleLogging.LogInfo("Authentication failed from " + request.remoteAddress)
+            ConsoleLogging.LogError("Authentication failed from " + request.remoteAddress)
             response.setStatusCode(HttpStatus.UNAUTHORIZED)
         }
 

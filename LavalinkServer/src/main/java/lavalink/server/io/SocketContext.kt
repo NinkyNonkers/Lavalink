@@ -168,7 +168,7 @@ class SocketContext(
                 }
 
                 override fun onError(channel: WebSocketChannel, context: Void?, throwable: Throwable) {
-                    ConsoleLogging.LogInfo("Error " + throwable)
+                    ConsoleLogging.LogError("Error " + throwable)
                 }
             })
     }
@@ -192,7 +192,7 @@ class SocketContext(
     }
 
     internal fun shutdown() {
-        ConsoleLogging.LogInfo("Shutting down " + playingPlayers.size + " playing players.")
+        ConsoleLogging.LogInfo("Shutting down " + playingPlayers.size + " playing players")
         executor.shutdown()
         playerUpdateService.shutdown()
         players.values.forEach {

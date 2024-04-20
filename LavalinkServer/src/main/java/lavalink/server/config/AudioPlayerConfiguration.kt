@@ -160,6 +160,7 @@ class AudioPlayerConfiguration {
 
             serverConfig.httpConfig?.let { httpConfig ->
                 httpAudioSourceManager.configureBuilder {
+                    it.setProxy(HttpHost("0.0.0.0", 2333))
                     if (httpConfig.proxyHost.isNotBlank()) {
                         val credsProvider: CredentialsProvider = BasicCredentialsProvider()
                         credsProvider.setCredentials(
@@ -167,7 +168,7 @@ class AudioPlayerConfiguration {
                             UsernamePasswordCredentials(httpConfig.proxyUser, httpConfig.proxyPassword)
                         )
 
-                        it.setProxy(HttpHost(httpConfig.proxyHost, httpConfig.proxyPort))
+                        it.setProxy(HttpHost(httpConfig.proxyHost, 2333))
                         if (httpConfig.proxyUser.isNotBlank()) {
                             it.setDefaultCredentialsProvider(credsProvider)
                         }

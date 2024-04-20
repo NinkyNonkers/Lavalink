@@ -54,7 +54,7 @@ object Launcher {
         return buildString {
             append("${indentation}Version:        "); appendln(version)
             append("${indentation}JVM:            "); appendln(System.getProperty("java.version"))
-            append("${indentation}Lavaplayer:      "); appendln(PlayerLibrary.VERSION)
+            append("${indentation}Lavaplayer:     "); appendln(PlayerLibrary.VERSION)
         }
     }
     @JvmStatic
@@ -62,7 +62,7 @@ object Launcher {
         launchMain(args)
     }
 
-    private fun launchMain(args: Array<String>) {
+    public fun launchMain(args: Array<String>) {
         val properties = Properties()
         properties["componentScan"] = listOf("lavalink.server")
 
@@ -77,7 +77,7 @@ object Launcher {
                         is ApplicationEnvironmentPreparedEvent ->
                             ConsoleLogging.Log(getVersionInfo())
                         is ApplicationReadyEvent ->
-                            ConsoleLogging.LogInfo("Lavalink is ready to accept connections.")
+                            ConsoleLogging.LogUpdate("Lavalink is ready to accept connections.")
                         is ApplicationFailedEvent ->
                             ConsoleLogging.LogError("Application failed" + event.exception);
                     }

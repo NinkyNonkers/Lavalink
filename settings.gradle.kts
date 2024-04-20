@@ -8,6 +8,18 @@ project(":Lavalink-Server").projectDir = file("$rootDir/LavalinkServer")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
+pluginManagement {
+    repositories {
+        mavenCentral()
+        maven("https://jitpack.io") // build projects directly from GitHub
+        maven ("https://maven.aliyun.com/repository/jcenter")
+        maven("https://m2.dv8tion.net/releases")
+        maven("https://maven.lavalink.dev/releases")
+        maven("https://maven.lavalink.dev/snapshots")
+
+    }
+}
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
@@ -34,10 +46,12 @@ fun VersionCatalogBuilder.spring() {
 }
 
 fun VersionCatalogBuilder.voice() {
-    version("lavaplayer", "2.1.1")
+    version("lavaplayer", "0eaeee195f0315b2617587aa3537fa202df07ddc-SNAPSHOT")
 
     library("lavaplayer",            "dev.arbjerg", "lavaplayer").versionRef("lavaplayer")
-    library("lavaplayer-ip-rotator", "dev.arbjerg", "lavaplayer-ext-youtube-rotator").versionRef("lavaplayer")
+    //library("lavaplayer-ip-rotator", "dev.arbjerg", "lavaplayer-ext-youtube-rotator").versionRef("lavaplayer")
+    //library("lavaplayer",            "com.github.Kamilake.lavaplayer", "lavaplayer").versionRef("lavaplayer")
+    library("lavaplayer-ip-rotator", "dev.arbjerg", "lavaplayer-ext-youtube-rotator").version("2.1.1")
     library("lavadsp",               "dev.arbjerg", "lavadsp").version("0.7.8")
 
     library("koe",          "moe.kyokobot.koe", "core").version("2.0.0-rc2")

@@ -80,7 +80,7 @@ public class AudioLoaderRestHandler {
                 object.put("track", encoded);
                 tracks.put(object);
             } catch (IOException e) {
-                ConsoleLogging.LogInfo("Failed to encode a track {}, skipping" + track.getIdentifier() + e);
+                ConsoleLogging.LogError("Failed to encode a track {}, skipping" + track.getIdentifier() + e);
             }
         });
 
@@ -97,7 +97,7 @@ public class AudioLoaderRestHandler {
             exception.put("severity", result.exception.severity.toString());
 
             json.put("exception", exception);
-            ConsoleLogging.LogInfo("Track loading failed " + result.exception);
+            ConsoleLogging.LogError("Track loading failed " + result.exception);
         }
 
         return json;
@@ -108,8 +108,6 @@ public class AudioLoaderRestHandler {
     public CompletionStage<ResponseEntity<String>> getLoadTracks(
             HttpServletRequest request,
             @RequestParam String identifier) {
-        ConsoleLogging.LogInfo("Got request to load for identifier " + identifier);
-
         return new AudioLoader(audioPlayerManager).load(identifier)
                 .thenApply(this::encodeLoadResult)
                 .thenApply(loadResultJson -> new ResponseEntity<>(loadResultJson.toString(), HttpStatus.OK));

@@ -25,7 +25,8 @@ class WebSocketHandler(
         "equalizer" to ::equalizer,
         "filters" to ::filters,
         "destroy" to ::destroy,
-        "configureResuming" to ::configureResuming
+        "configureResuming" to ::configureResuming,
+        "download" to ::download
     )
 
     fun handle(json: JSONObject) {
@@ -126,6 +127,18 @@ class WebSocketHandler(
         val filters = player.filters ?: FilterChain()
         filters.equalizer = list
         player.filters = filters
+    }
+
+    private fun download(json: JSONObject) {
+        val targetPath = json.getString("targetPath");
+        val player = context.getPlayer(json.getString("guildId"))
+
+        val track = Util.toAudioTrack(context.audioPlayerManager, json.getString("track"))
+
+        if (json.has("startTime"))
+            track.position = json.getLong("startTime")
+
+        player.download(track, targetPath);
     }
 
     private fun filters(json: JSONObject) {

@@ -28,18 +28,28 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
+import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrameProvider;
 import io.netty.buffer.ByteBuf;
 import lavalink.api.IPlayer;
 import lavalink.api.ISocketContext;
 import lavalink.server.io.SocketContext;
 import lavalink.server.io.SocketServer;
+import lavalink.server.logging.ConsoleLogging;
 import lavalink.server.player.filters.FilterChain;
 import lavalink.server.config.ServerConfig;
 import moe.kyokobot.koe.MediaConnection;
 import moe.kyokobot.koe.media.OpusAudioFrameProvider;
 import org.json.JSONObject;
+import org.yaml.snakeyaml.util.ArrayUtils;
 
 import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -49,11 +59,13 @@ public class Player extends AudioEventAdapter implements IPlayer {
     private final long guildId;
     private final ServerConfig serverConfig;
     private final AudioPlayer player;
+    private final AudioPlayerManager playerManager;
     private final AudioLossCounter audioLossCounter = new AudioLossCounter();
     private AudioFrame lastFrame = null;
     private FilterChain filters;
     private ScheduledFuture<?> myFuture = null;
     private boolean endMarkerHit = false;
+
 
     public Player(SocketContext socketContext, long guildId, AudioPlayerManager audioPlayerManager, ServerConfig serverConfig) {
         this.socketContext = socketContext;
@@ -63,11 +75,39 @@ public class Player extends AudioEventAdapter implements IPlayer {
         this.player.addListener(this);
         this.player.addListener(new EventEmitter(audioPlayerManager, this));
         this.player.addListener(audioLossCounter);
+        this.playerManager = audioPlayerManager;
     }
 
     public void play(AudioTrack track) {
         player.playTrack(track);
         SocketServer.Companion.sendPlayerUpdate(socketContext, this);
+    }
+
+    public void download(AudioTrack track, String savePath) {
+        try {
+            AudioPlayer downloadPlayer = playerManager.createPlayer();
+            downloadPlayer.playTrack(track);
+            ConsoleLogging.LogInfo("Downloading " + track.getIdentifier() + " to " + savePath);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+            while (downloadPlayer.getPlayingTrack() != null) {
+                AudioFrame prov = downloadPlayer.provide(0, TimeUnit.MICROSECONDS);
+                if (prov == null)
+                    continue;
+                bos.write(prov.getData());
+            }
+
+            FileOutputStream fos = new FileOutputStream(savePath);
+            fos.write(bos.toByteArray());
+            fos.close();
+            JSONObject obj = new JSONObject();
+            obj.put("op", "dl");
+            obj.put("identifier", track.getIdentifier());
+            socketContext.send(obj);
+        }
+        catch (Exception e) {
+            ConsoleLogging.LogError(e.getMessage());
+        }
     }
 
     public void stop() {
@@ -182,12 +222,13 @@ public class Player extends AudioEventAdapter implements IPlayer {
         public boolean canProvide() {
             lastFrame = player.provide();
 
-            if(lastFrame == null) {
+            if (lastFrame == null) {
                 audioLossCounter.onLoss();
                 return false;
-            } else {
-                return true;
             }
+            else
+                return true;
+
         }
 
         @Override
@@ -205,10 +246,9 @@ public class Player extends AudioEventAdapter implements IPlayer {
     public void setFilters(FilterChain filters) {
         this.filters = filters;
 
-        if (filters.isEnabled()) {
+        if (filters.isEnabled())
             player.setFilterFactory(filters);
-        } else {
+        else
             player.setFilterFactory(null);
-        }
     }
 }

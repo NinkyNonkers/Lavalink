@@ -80,7 +80,7 @@ class SocketServer(
         if (resumable != null) {
             contextMap[session.id] = resumable
             resumable.resume(session)
-            ConsoleLogging.LogInfo("Resumed session with key $resumeKey")
+            ConsoleLogging.LogUpdate("Resumed session with key $resumeKey")
             return
         }
 
@@ -97,15 +97,15 @@ class SocketServer(
         socketContext.send("Brand: NinkyNonk/LavaLink");
 
         if (clientName != null) {
-            ConsoleLogging.LogInfo("Connection successfully established from $clientName")
+            ConsoleLogging.LogUpdate("Connection successfully established from $clientName")
             return
         }
 
-        ConsoleLogging.LogInfo("Connection successfully established")
+        ConsoleLogging.LogUpdate("Connection successfully established")
         if (userAgent != null) {
-            ConsoleLogging.LogInfo("Library developers: Please specify a 'Client-Name' header. User agent: $userAgent")
+            ConsoleLogging.LogUpdate("Library developers: Please specify a 'Client-Name' header. User agent: $userAgent")
         } else {
-            ConsoleLogging.LogInfo("Library developers: Please specify a 'Client-Name' header.")
+            ConsoleLogging.LogUpdate("Library developers: Please specify a 'Client-Name' header.")
         }
     }
 
@@ -113,14 +113,14 @@ class SocketServer(
         val context = contextMap.remove(session!!.id) ?: return
         if (context.resumeKey != null) {
             resumableSessions.remove(context.resumeKey!!)?.let { removed ->
-                ConsoleLogging.LogInfo("Shutdown resumable session with key ${removed.resumeKey} because it has the same key as a " +
+                ConsoleLogging.LogUpdate("Shutdown resumable session with key ${removed.resumeKey} because it has the same key as a " +
                         "newly disconnected resumable session.")
                 removed.shutdown()
             }
 
             resumableSessions[context.resumeKey!!] = context
             context.pause()
-            ConsoleLogging.LogInfo("Connection closed from {} with status {} -- " +
+            ConsoleLogging.LogUpdate("Connection closed from {} with status {} -- " +
                     "Session can be resumed within the next {} seconds with key " +
                     session.remoteAddress +
                     status +
@@ -130,7 +130,7 @@ class SocketServer(
             return
         }
 
-        ConsoleLogging.LogInfo("Connection closed from " + session.remoteAddress + status)
+        ConsoleLogging.LogUpdate("Connection closed from " + session.remoteAddress + status)
         context.shutdown()
     }
 
@@ -138,7 +138,7 @@ class SocketServer(
         try {
             handleTextMessageSafe(session!!, message!!)
         } catch (e: Exception) {
-            ConsoleLogging.LogInfo("Exception while handling websocket message " + e)
+            ConsoleLogging.LogError("Exception while handling websocket message " + e)
         }
 
     }
@@ -146,7 +146,7 @@ class SocketServer(
     private fun handleTextMessageSafe(session: WebSocketSession, message: TextMessage) {
         val json = JSONObject(message.payload)
 
-        ConsoleLogging.LogInfo(message.payload)
+        ConsoleLogging.Log(message.payload)
 
         if (!session.isOpen) {
             ConsoleLogging.LogInfo("Ignoring closing websocket: " + session.remoteAddress!!)
