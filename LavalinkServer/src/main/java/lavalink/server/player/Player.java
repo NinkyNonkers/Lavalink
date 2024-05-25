@@ -22,6 +22,7 @@
 
 package lavalink.server.player;
 
+import com.sedmelluq.discord.lavaplayer.format.AudioDataFormat;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -29,6 +30,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrameProvider;
+import dev.lavalink.youtube.ManagerFactory;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import io.netty.buffer.ByteBuf;
 import lavalink.api.IPlayer;
 import lavalink.api.ISocketContext;
@@ -43,12 +46,14 @@ import org.json.JSONObject;
 import org.yaml.snakeyaml.util.ArrayUtils;
 
 import javax.annotation.Nullable;
+import javax.sound.sampled.AudioFormat;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -89,12 +94,11 @@ public class Player extends AudioEventAdapter implements IPlayer {
             downloadPlayer.playTrack(track);
             ConsoleLogging.LogInfo("Downloading " + track.getIdentifier() + " to " + savePath);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
             while (downloadPlayer.getPlayingTrack() != null) {
-                AudioFrame prov = downloadPlayer.provide(0, TimeUnit.MICROSECONDS);
+                AudioFrame prov = downloadPlayer.provide();
                 if (prov == null)
                     continue;
-                bos.write(prov.getData());
+                bos.write(prov.getData().clone());
             }
 
             FileOutputStream fos = new FileOutputStream(savePath);

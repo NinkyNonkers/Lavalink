@@ -18,6 +18,7 @@ import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup
 import com.sedmelluq.lava.extensions.youtuberotator.planner.*
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv4Block
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block
+import dev.lavalink.youtube.ManagerFactory
 import lavalink.server.logging.ConsoleLogging
 import org.apache.http.HttpHost
 import org.apache.http.auth.AuthScope
@@ -45,7 +46,7 @@ class AudioPlayerConfiguration {
         mediaContainerProbes: Collection<MediaContainerProbe>
     ): AudioPlayerManager {
         val audioPlayerManager = DefaultAudioPlayerManager()
-
+        audioPlayerManager.registerSourceManager(ManagerFactory.Create())
         if (serverConfig.isGcWarnings)
             audioPlayerManager.enableGcMonitoring()
 

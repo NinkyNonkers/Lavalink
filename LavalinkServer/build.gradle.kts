@@ -50,7 +50,8 @@ dependencies {
 
     implementation(libs.lavaplayer)
     implementation(libs.lavaplayer.ip.rotator)
-
+    implementation(libs.rhino.engine)
+    implementation(libs.nanojson)
     implementation(libs.lavadsp)
     implementation(libs.kotlin.reflect)
     implementation(libs.oshi)
