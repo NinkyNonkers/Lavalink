@@ -30,6 +30,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrameProvider;
+import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
 import dev.lavalink.youtube.ManagerFactory;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import io.netty.buffer.ByteBuf;
@@ -93,16 +94,15 @@ public class Player extends AudioEventAdapter implements IPlayer {
             AudioPlayer downloadPlayer = playerManager.createPlayer();
             downloadPlayer.playTrack(track);
             ConsoleLogging.LogInfo("Downloading " + track.getIdentifier() + " to " + savePath);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            MutableAudioFrame frame = new MutableAudioFrame();
             while (downloadPlayer.getPlayingTrack() != null) {
                 AudioFrame prov = downloadPlayer.provide();
                 if (prov == null)
                     continue;
-                bos.write(prov.getData().clone());
+                frame.store(prov.getData(), prov.getDataLength(), frame.getDataLength());
             }
-
             FileOutputStream fos = new FileOutputStream(savePath);
-            fos.write(bos.toByteArray());
+            fos.write(frame.getData());
             fos.close();
             JSONObject obj = new JSONObject();
             obj.put("op", "dl");
